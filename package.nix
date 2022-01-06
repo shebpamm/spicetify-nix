@@ -121,6 +121,8 @@ pkgs.spotify-unwrapped.overrideAttrs (oldAttrs: rec {
       lyric_always_show ${boolToString lyricAlwaysShow } \
       lyric_force_no_sync ${boolToString lyricForceNoSync }
 
+    mkdir -p $out/share/spotify/Apps/zlink/css
+
     ${spicetify} backup apply
 
     cd $out/share/spotify
