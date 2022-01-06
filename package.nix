@@ -73,6 +73,9 @@ pkgs.spotify-unwrapped.overrideAttrs (oldAttrs: rec {
     mkdir Extensions
     mkdir CustomApps
 
+    mkdir -p $out/share/spotify/Apps/zlink/css
+    touch $out/share/spotify/Apps/zlink/css/user.css
+
     find ${themes} -maxdepth 1 -type d -exec ln -s {} Themes \;
     ${extraCommands}
     
@@ -121,7 +124,6 @@ pkgs.spotify-unwrapped.overrideAttrs (oldAttrs: rec {
       lyric_always_show ${boolToString lyricAlwaysShow } \
       lyric_force_no_sync ${boolToString lyricForceNoSync }
 
-    mkdir -p $out/share/spotify/Apps/zlink/css
 
     ${spicetify} backup apply
 
