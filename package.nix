@@ -1,7 +1,5 @@
-{ 
-  pkgs ? import <nixpkgs> {},
-  fetchFromGitHub,
-  theme ? "SpicetifyDefault",
+{pkgs, themes }: { 
+  theme ? "Ziro",
   colorScheme ? "",
   thirdParyThemes ? {},
   thirdParyExtensions ? {},
@@ -38,16 +36,8 @@ let
   makeLnCommands = type: (mapAttrsToList (name: path: "ln -sf ${path} ./${type}/${name}"));
 
   # Setup spicetify
-  spicetifyPkg = pkgs.callPackage ./spicetify.nix {};
-  spicetify = "SPICETIFY_CONFIG=. ${spicetifyPkg}/spicetify";
-
-  themes = fetchFromGitHub {
-    owner = "morpheusthewhite";
-    repo = "spicetify-themes";
-    rev = "fdadc4c1cfe38ecd22cf828d2c825e0af1dcda9f";
-    sha256 = "1k44g8rmf8bh4kk16w4n9z1502ag3w67ad3jx28327ykq8pq5w29";
-    fetchSubmodules = true;
-  };
+  spicetifyPkg = pkgs.spicetify-cli;
+  spicetify = "SPICETIFY_CONFIG=. ${spicetifyPkg}/bin/spicetify-cli";
 
   # Dribblish is a theme which needs a couple extra settings
   isDribblish = theme == "Dribbblish";
@@ -79,8 +69,15 @@ pkgs.spotify-unwrapped.overrideAttrs (oldAttrs: rec {
     find ${themes} -maxdepth 1 -type d -exec ln -s {} Themes \;
     ${extraCommands}
     
+    ${spicetify} -q
+
+
+    sed -i "s;spotify_path            = $;spotify_path            = $out/share/spotify;" config-xpui.ini
+    sed -i "s;prefs_path              = $;prefs_path            = $out/prefs;" config-xpui.ini
+
+    cat config-xpui.ini
+
     ${spicetify} config \
-      spotify_path "$out/share/spotify" \
       prefs_path "$out/prefs" \
       current_theme ${theme} \
       ${if 
@@ -115,14 +112,7 @@ pkgs.spotify-unwrapped.overrideAttrs (oldAttrs: rec {
       remove_rtl_rule ${boolToString removeRtlRule } \
       expose_apis ${boolToString exposeApis } \
       disable_upgrade_check ${boolToString disableUpgradeCheck } \
-      fastUser_switching ${boolToString fastUserSwitching } \
-      visualization_high_framerate ${boolToString visualizationHighFramerate } \
-      radio ${boolToString radio } \
-      song_page ${boolToString songPage } \
       experimental_features ${boolToString experimentalFeatures } \
-      home ${boolToString home } \
-      lyric_always_show ${boolToString lyricAlwaysShow } \
-      lyric_force_no_sync ${boolToString lyricForceNoSync }
 
 
     ${spicetify} backup apply
